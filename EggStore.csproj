@@ -30,7 +30,7 @@
     <Folder Include="Domains\Eggs\Dmo\" />
     <Folder Include="Domains\TransactionItems\Dmo\" />
     <Folder Include="Domains\Transactions\Dmo\" />
-    <Folder Include="Domains\Packages\Dmo\" />
+    <Folder Include="Domains\PackagesEgg\Dmo\" />
     <Folder Include="Domains\Users\Dmo\" />
     <Folder Include="Infrastucture\Helpers\ErrorHandlers\" />
   </ItemGroup>
