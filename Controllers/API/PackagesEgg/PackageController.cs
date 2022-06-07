@@ -1,22 +1,28 @@
 ﻿using EggStore.Domains.Packages.Dto;
 using EggStore.Domains.Packages.Interface;
+using EggStore.Domains.Packages.Validators;
 using EggStore.Infrastucture.Helpers.ResponseBuilders;
 using EggStore.Infrastucture.Shareds.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using FluentValidation;
 
 namespace EggStore.Controllers.API.Packages
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/packages")]
     [ApiController]
     public class PackageController : ControllerBase
     {
         private readonly IPackages _IPackages;
+        private readonly PackagesValidator _packagesValidator;
 
-        public PackageController(IPackages iPackages)
+        public PackageController(
+            IPackages iPackages,
+            PackagesValidator packagesValidator)
         {
             _IPackages = iPackages;
+            _packagesValidator = packagesValidator;
         }
 
         [HttpGet]
@@ -36,8 +42,19 @@ namespace EggStore.Controllers.API.Packages
         [HttpPost]
         public async Task<ActionResult> CreatePackage(PackagesDto param)
         {
-            var data = await Task.FromResult(_IPackages.Create(param));
-            return Ok(ResponseBuilder.SuccessResponse(ResponseConstant.Store, data));
+            //return Ok(param);
+            _packagesValidator.ValidateAndThrow(param);
+            return Ok(param);
+
+            //var validation = _packagesValidator.Validate(param);
+            //if (validation.IsValid)
+            //{
+            //var data = await Task.FromResult(_IPackages.Create(param));
+            //return Ok(ResponseBuilder.SuccessResponse(ResponseConstant.Store, data));
+            //}
+
+            //return StatusCode(422, ResponseBuilder.UnprocessableEntityResponse(422, validation));
+
         }
 
         [HttpPut("{id}")]

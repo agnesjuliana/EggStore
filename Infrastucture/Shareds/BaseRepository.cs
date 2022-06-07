@@ -1,6 +1,6 @@
 ﻿using EggStore.Infrastucture.Shareds.DataAccess;
 
-namespace EggStore.Infrastucture
+namespace EggStore.Infrastucture.Shareds
 {
     public class BaseRepository
     {

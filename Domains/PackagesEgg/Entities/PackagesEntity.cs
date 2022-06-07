@@ -7,6 +7,8 @@ namespace EggStore.Domains.Packages.Entities
     [Table("packages")]
     public class PackagesEntity : BaseEntity
     {
+        internal bool id;
+
         [Column("id")]
         [Key]
         public Guid Id { get; set; }

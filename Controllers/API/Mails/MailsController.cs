@@ -1,6 +1,8 @@
 ﻿using EggStore.Domains.Mails.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Coravel.Queuing.Interfaces;
+using EggStore.Infrastucture.Helpers.ResponseBuilders;
 
 namespace EggStore.Controllers.API.Mails
 {
@@ -9,9 +11,11 @@ namespace EggStore.Controllers.API.Mails
     public class MailsController : ControllerBase
     {
         IEmailSender _emailSender;
-        public MailsController(IEmailSender emailSender)
+        private IQueue _queue;
+        public MailsController(IEmailSender emailSender, IQueue queue)
         {
             _emailSender = emailSender;
+            _queue = queue;
         }
 
         [HttpPost("send")]
@@ -19,8 +23,12 @@ namespace EggStore.Controllers.API.Mails
         {
             try
             {
-                string messageStatus = await _emailSender.SendEmailAsync(recipientEmail, recipientFirstName, Link);
-                return Ok(messageStatus);
+                _queue.QueueTask(() =>
+                {
+                    _emailSender.SendEmailAsync(recipientEmail, recipientFirstName, Link);
+                });
+
+                return Ok(ResponseBuilder.SuccessResponse("Success sending email", null));
             }
             catch (Exception ex)
             {

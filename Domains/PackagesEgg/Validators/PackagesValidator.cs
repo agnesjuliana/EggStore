@@ -1,14 +1,16 @@
-﻿using EggStore.Domains.Packages.Entities;
+﻿using EggStore.Domains.Packages.Dto;
+using EggStore.Infrastucture.Shareds;
 using FluentValidation;
 
 namespace EggStore.Domains.Packages.Validators
 {
-    public class PackagesValidator : AbstractValidator<PackagesEntity>
+    public class PackagesValidator : BaseValidator<PackagesDto>
     {
         public PackagesValidator()
         {
             RuleFor(x => x.PackageName)
-                .NotEmpty();
+                .NotEmpty()
+                .WithMessage("{PropertyName} " + message);
         }
     }
 }

@@ -5,8 +5,10 @@ using EggStore.Domains.Mails.Models;
 using EggStore.Domains.Mails.Services;
 using EggStore.Domains.Packages.Interface;
 using EggStore.Domains.Packages.Repositories;
+using EggStore.Domains.Packages.Validators;
 using EggStore.Domains.Users.Interface;
 using EggStore.Domains.Users.Repositories;
+using EggStore.Infrastucture.Middlewares;
 using EggStore.Infrastucture.Shareds.DataAccess;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,17 +50,20 @@ builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetSection(
 builder.Services.AddSingleton<IEmailSender, EmailSender>();
 
 // Add controller to  service
-builder.Services.AddControllers()
-                .AddFluentValidation(options =>
+builder.Services.AddControllers();
+
+builder.Services.AddMvc(option => option.EnableEndpointRouting = false)
+                .AddFluentValidation(/*fvc => fvc.RegisterValidatorsFromAssemblyContaining<Program>()*/)
+                .AddNewtonsoftJson(options =>
                  {
-                     // Validate child properties and root collection elements
-                     options.ImplicitlyValidateChildProperties = true;
-                     options.ImplicitlyValidateRootCollectionElements = true;
-                     // Automatic registration of validators in assembly
-                     options.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+                     options.SerializerSettings.ContractResolver = new DefaultContractResolver()
+                     {
+                         NamingStrategy = new SnakeCaseNamingStrategy()
+                     };
                  });
 
-
+// Add validator
+builder.Services.AddScoped<PackagesValidator>();
 
 // Add Logger to service
 builder.Host.ConfigureLogging(options =>
@@ -97,6 +103,14 @@ builder.Services.AddSwaggerGen(c =>
                 });
 });
 
+// Configure sentry
+builder.WebHost.UseSentry(o =>
+{
+    o.Dsn = "https://ba244ba1e19d4ab0bc9fe2a3fd56188c@o1278378.ingest.sentry.io/6477701";
+    o.Debug = true;
+    o.TracesSampleRate = 1.0;
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -110,6 +124,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ErrorHandlerMiddleware>();
+
+app.UseSentryTracing();
+
+app.UseMvc();
 
 app.UseHttpsRedirection();
 

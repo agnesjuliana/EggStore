@@ -1,8 +1,6 @@
 ﻿using EggStore.Domains.Users.Dto;
 using EggStore.Infrastucture.Helpers.ResponseBuilders;
-using EggStore.Infrastucture.Shareds.Constants;
 using EggStore.Infrastucture.Shareds.DataAccess;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

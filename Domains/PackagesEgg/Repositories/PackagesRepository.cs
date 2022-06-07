@@ -16,7 +16,7 @@ namespace EggStore.Domains.Packages.Repositories
 
         public PackagesEntity FindById(Guid id)
         {
-            return _context.PackagesEntities.Find(id);
+            return _context.PackagesEntities.First(x=>x.Id == id);
         }
 
         public List<PackagesEntity> FindAll()
