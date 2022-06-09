@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EggStore.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220526132911_CreateInitial")]
-    partial class CreateInitial
+    [Migration("20220609154238_TransactionItemMigration")]
+    partial class TransactionItemMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -41,8 +41,7 @@ namespace EggStore.Migrations
                         .HasColumnName("egg_name");
 
                     b.Property<Guid>("PackageId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("package_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<double>("Price")
                         .HasColumnType("float")
@@ -56,12 +55,12 @@ namespace EggStore.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("packageId")
+                    b.Property<Guid>("package_id")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("packageId");
+                    b.HasIndex("package_id");
 
                     b.ToTable("eggs");
                 });
@@ -196,13 +195,13 @@ namespace EggStore.Migrations
 
             modelBuilder.Entity("EggStore.Domains.Eggs.Entities.EggsEntity", b =>
                 {
-                    b.HasOne("EggStore.Domains.Packages.Entities.PackagesEntity", "PackagesEntity")
+                    b.HasOne("EggStore.Domains.Packages.Entities.PackagesEntity", "PackageEntity")
                         .WithMany()
-                        .HasForeignKey("packageId")
+                        .HasForeignKey("package_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PackagesEntity");
+                    b.Navigation("PackageEntity");
                 });
 
             modelBuilder.Entity("EggStore.Domains.TransactionItems.Entities.TransactionItemsEntity", b =>

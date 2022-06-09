@@ -6,6 +6,7 @@ using EggStore.Infrastucture.Shareds.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
+using EggStore.Domains.Packages.Repositories;
 
 namespace EggStore.Controllers.API.Packages
 {
@@ -14,28 +15,28 @@ namespace EggStore.Controllers.API.Packages
     [ApiController]
     public class PackageController : ControllerBase
     {
-        private readonly IPackages _IPackages;
-        private readonly PackagesValidator _packagesValidator;
+        private readonly PackagesRepository _repositoryPackage;
+        private readonly PackagesValidator _validatorPackage;
 
         public PackageController(
-            IPackages iPackages,
-            PackagesValidator packagesValidator)
+            PackagesRepository packagesRepository,
+            PackagesValidator validatorPackage)
         {
-            _IPackages = iPackages;
-            _packagesValidator = packagesValidator;
+            _repositoryPackage = packagesRepository;
+            _validatorPackage = validatorPackage;
         }
 
         [HttpGet]
         public async Task<ActionResult> GetPackageList()
         {
-            var data = await Task.FromResult(_IPackages.FindAll());
+            var data = await Task.FromResult(_repositoryPackage.FindAll());
             return Ok(ResponseBuilder.SuccessResponse(ResponseConstant.Detail, data));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult> GetPackageById(Guid id)
         {
-            var data = await Task.FromResult(_IPackages.FindById(id));
+            var data = await Task.FromResult(_repositoryPackage.FindById(id));
             return Ok(ResponseBuilder.SuccessResponse(ResponseConstant.Detail, data));
         }
 
@@ -43,14 +44,14 @@ namespace EggStore.Controllers.API.Packages
         public async Task<ActionResult> CreatePackage(PackagesDto param)
         {
             //return Ok(param);
-            _packagesValidator.ValidateAndThrow(param);
-            return Ok(param);
+            _validatorPackage.ValidateAndThrow(param);
+            //return Ok(param);
 
             //var validation = _packagesValidator.Validate(param);
             //if (validation.IsValid)
             //{
-            //var data = await Task.FromResult(_IPackages.Create(param));
-            //return Ok(ResponseBuilder.SuccessResponse(ResponseConstant.Store, data));
+            var data = await Task.FromResult(_repositoryPackage.Create(param));
+            return Ok(ResponseBuilder.SuccessResponse(ResponseConstant.Store, data));
             //}
 
             //return StatusCode(422, ResponseBuilder.UnprocessableEntityResponse(422, validation));
@@ -60,7 +61,7 @@ namespace EggStore.Controllers.API.Packages
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePackage(PackagesDto param, Guid id)
         {
-            var data = await Task.FromResult(_IPackages.Update(param, id));
+            var data = await Task.FromResult(_repositoryPackage.Update(param, id));
             return Ok(ResponseBuilder.SuccessResponse(ResponseConstant.Update, data));
         }
 
@@ -68,7 +69,7 @@ namespace EggStore.Controllers.API.Packages
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePackage(Guid id)
         {
-            var data = await Task.FromResult(_IPackages.Delete(id));
+            var data = await Task.FromResult(_repositoryPackage.Delete(id));
             return Ok(ResponseBuilder.SuccessResponse(ResponseConstant.Delete, data));
         }
     }

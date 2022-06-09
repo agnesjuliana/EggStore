@@ -39,7 +39,7 @@ namespace EggStore.Controllers.API.Users
         [HttpPost]
         public async Task<ActionResult> CreateUser(UsersDto param)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ResponseBuilder.ErrorResponse(400, "Bad Request", ModelState));
 
             var users = await _users.Create(param);

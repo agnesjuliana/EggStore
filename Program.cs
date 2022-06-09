@@ -3,20 +3,18 @@ global using Microsoft.EntityFrameworkCore;
 using EggStore.Domains.Mails.Interface;
 using EggStore.Domains.Mails.Models;
 using EggStore.Domains.Mails.Services;
-using EggStore.Domains.Packages.Interface;
 using EggStore.Domains.Packages.Repositories;
 using EggStore.Domains.Packages.Validators;
-using EggStore.Domains.Users.Interface;
 using EggStore.Domains.Users.Repositories;
 using EggStore.Infrastucture.Middlewares;
 using EggStore.Infrastucture.Shareds.DataAccess;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
 using System.Text;
 using Newtonsoft.Json.Serialization;
+using EggStore.Domains.Eggs.Repositories;
+using EggStore.Domains.Eggs.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,8 +25,13 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 
 // Add repository to service. 
-builder.Services.AddTransient<IPackages, PackagesRepository>();
-builder.Services.AddTransient<IUsers, UsersRepository>();
+builder.Services.AddScoped<PackagesRepository>();
+builder.Services.AddScoped<UsersRepository>();
+builder.Services.AddScoped<EggsRepository>();
+
+// Add validator
+builder.Services.AddScoped<PackagesValidator>();
+builder.Services.AddScoped<EggsValidator>();
 
 // Add jwt config
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -53,7 +56,11 @@ builder.Services.AddSingleton<IEmailSender, EmailSender>();
 builder.Services.AddControllers();
 
 builder.Services.AddMvc(option => option.EnableEndpointRouting = false)
-                .AddFluentValidation(/*fvc => fvc.RegisterValidatorsFromAssemblyContaining<Program>()*/)
+                //.AddFluentValidation(s =>
+                //{
+                //    //s.RegisterValidatorsFromAssemblyContaining<Startup>();
+                //    //s.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                //})
                 .AddNewtonsoftJson(options =>
                  {
                      options.SerializerSettings.ContractResolver = new DefaultContractResolver()
@@ -62,8 +69,6 @@ builder.Services.AddMvc(option => option.EnableEndpointRouting = false)
                      };
                  });
 
-// Add validator
-builder.Services.AddScoped<PackagesValidator>();
 
 // Add Logger to service
 builder.Host.ConfigureLogging(options =>

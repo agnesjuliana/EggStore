@@ -24,7 +24,8 @@ namespace EggStore.Domains.Eggs.Entities
         [Column("price")]
         public double Price { get; set; }
 
-        [ForeignKey("packageId")]
-        public PackagesEntity PackagesEntity { get; set; }
+
+        [ForeignKey("PackageId")]
+        public PackagesEntity PackageEntity { get; set; }
     }
 }

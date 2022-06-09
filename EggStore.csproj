@@ -37,6 +37,7 @@
     <Folder Include="Domains\PackagesEgg\Dmo\" />
     <Folder Include="Domains\Users\Dmo\" />
     <Folder Include="Infrastucture\Helpers\ErrorHandlers\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>
